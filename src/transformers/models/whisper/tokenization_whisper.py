@@ -185,6 +185,7 @@ LANGUAGES = {
     "jw": "javanese",
     "su": "sundanese",
     "yue": "cantonese",
+    "sah": "sakha",
 }
 
 # language code lookup by name, with a few language aliases
