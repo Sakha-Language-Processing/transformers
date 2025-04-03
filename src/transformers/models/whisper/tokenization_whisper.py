@@ -379,7 +379,7 @@ class WhisperTokenizer(PreTrainedTokenizer):
         return word
 
     def set_prefix_tokens(
-        self, language: Optional[str] = None, task: Optional[str] = None, predict_timestamps: bool = None
+        self, language: Optional[str] = None, task: Optional[str] = None, predict_timestamps: Optional[bool] = None
     ):
         """
         Override the prefix tokens appended to the start of the label sequence. This method can be used standalone to
@@ -677,7 +677,7 @@ class WhisperTokenizer(PreTrainedTokenizer):
         self,
         token_ids,
         skip_special_tokens: bool = False,
-        clean_up_tokenization_spaces: bool = None,
+        clean_up_tokenization_spaces: Optional[bool] = None,
         output_offsets: bool = False,
         time_precision: float = 0.02,
         decode_with_timestamps: bool = False,
