@@ -3,7 +3,7 @@ name: Build docker images (scheduled)
 on:
   push:
     branches:
-      - fix_mistral_3
+      - fix_mistral_4
   repository_dispatch:
   workflow_call:
     inputs:
