@@ -297,7 +297,7 @@ class Mistral3IntegrationTest(unittest.TestCase):
         cleanup(torch_device, gc_collect=True)
         self.model_checkpoint = "mistralai/Mistral-Small-3.1-24B-Instruct-2503"
         self.model = Mistral3ForConditionalGeneration.from_pretrained(
-            self.model_checkpoint, torch_dtype=torch.bfloat16
+            self.model_checkpoint, torch_dtype=torch.float16
         )
         accelerate.cpu_offload(self.model, execution_device=torch_device)
 
@@ -319,7 +319,7 @@ class Mistral3IntegrationTest(unittest.TestCase):
 
         inputs = processor.apply_chat_template(
             messages, add_generation_prompt=True, tokenize=True, return_dict=True, return_tensors="pt"
-        ).to(torch_device, dtype=torch.bfloat16)
+        ).to(torch_device, dtype=torch.float16)
 
         with torch.no_grad():
             generate_ids = self.model.generate(**inputs, max_new_tokens=200, do_sample=False)
@@ -351,7 +351,7 @@ class Mistral3IntegrationTest(unittest.TestCase):
 
         inputs = processor.apply_chat_template(
             messages, add_generation_prompt=True, tokenize=True, return_dict=True, return_tensors="pt"
-        ).to(torch_device, dtype=torch.bfloat16)
+        ).to(torch_device, dtype=torch.float16)
         with torch.no_grad():
             generate_ids = self.model.generate(**inputs, max_new_tokens=20, do_sample=False)
             decoded_output = processor.decode(
@@ -361,8 +361,8 @@ class Mistral3IntegrationTest(unittest.TestCase):
         expected_outputs = Expectations(
             {
                 ("xpu", 3): "The image features two cats resting on a pink blanket. The cat on the left is a kitten",
-                ("cuda", 7): "The image features two cats resting on a pink blanket. The cat on the left is a kitten",
-                ("cuda", 8): "The image features two cats resting on a pink blanket. The cat on the left is a small kit",
+                ("cuda", 7): 'The image features two tabby cats lying on a pink surface, which appears to be a couch or',
+                ("cuda", 8): 'The image features two cats lying on a pink surface, which appears to be a couch or a bed',
             }
         )  # fmt: skip
         expected_output = expected_outputs.get_expectation()
@@ -378,7 +378,10 @@ class Mistral3IntegrationTest(unittest.TestCase):
                 {
                     "role": "user",
                     "content": [
-                        {"type": "image", "url": "https://huggingface.co/ydshieh/kosmos-2.5/resolve/main/view.jpg"},
+                        {
+                            "type": "image",
+                            "url": "https://huggingface.co/datasets/hf-internal-testing/testing-data-mistral3/resolve/main/view.jpg",
+                        },
                         {"type": "text", "text": "Write a haiku for this image"},
                     ],
                 },
@@ -396,7 +399,7 @@ class Mistral3IntegrationTest(unittest.TestCase):
 
         inputs = processor.apply_chat_template(
             messages, padding=True, add_generation_prompt=True, tokenize=True, return_dict=True, return_tensors="pt"
-        ).to(torch_device, dtype=torch.bfloat16)
+        ).to(torch_device, dtype=torch.float16)
 
         output = self.model.generate(**inputs, do_sample=False, max_new_tokens=25)
 
@@ -408,8 +411,8 @@ class Mistral3IntegrationTest(unittest.TestCase):
         expected_outputs = Expectations(
             {
                 ("xpu", 3): "Calm lake's mirror gleams,\nWhispering pines stand in silence,\nPath to peace begins.",
-                ("cuda", 7): "Calm waters reflect\nWhispering pines stand in silence\nPath to peace begins",
-                ("cuda", 8): "Calm waters reflect\nWhispering pines stand in silence\nPath to peace begins",
+                ("cuda", 7): 'Calm waters reflect\nWooden path to distant shore\nSilence in the woods',
+                ("cuda", 8): "Wooden path to calm,\nReflections whisper secrets,\nNature's peace unfolds.",
             }
         )  # fmt: skip
         expected_output = expected_outputs.get_expectation()
@@ -424,8 +427,8 @@ class Mistral3IntegrationTest(unittest.TestCase):
         expected_outputs = Expectations(
             {
                 ("xpu", 3): "The image depicts a vibrant urban scene in what appears to be Chinatown. The focal point is a traditional Chinese archway",
-                ("cuda", 7): 'The image depicts a vibrant street scene in Chinatown, likely in a major city. The focal point is a traditional Chinese',
-                ("cuda", 8): 'The image depicts a vibrant street scene in what appears to be Chinatown in a major city. The focal point is a',
+                ("cuda", 7): 'The image depicts a street scene in what appears to be a Chinatown district. The focal point is a traditional Chinese arch',
+                ("cuda", 8): 'The image depicts a street scene in what appears to be a Chinatown district. The focal point is a traditional Chinese arch',
             }
         )  # fmt: skip
         expected_output = expected_outputs.get_expectation()
@@ -446,7 +449,10 @@ class Mistral3IntegrationTest(unittest.TestCase):
                 {
                     "role": "user",
                     "content": [
-                        {"type": "image", "url": "https://huggingface.co/ydshieh/kosmos-2.5/resolve/main/view.jpg"},
+                        {
+                            "type": "image",
+                            "url": "https://huggingface.co/datasets/hf-internal-testing/testing-data-mistral3/resolve/main/view.jpg",
+                        },
                         {"type": "text", "text": "Write a haiku for this image"},
                     ],
                 },
@@ -457,11 +463,11 @@ class Mistral3IntegrationTest(unittest.TestCase):
                     "content": [
                         {
                             "type": "image",
-                            "url": "https://huggingface.co/ydshieh/kosmos-2.5/resolve/main/Statue-of-Liberty-Island-New-York-Bay.jpg",
+                            "url": "https://huggingface.co/datasets/hf-internal-testing/testing-data-mistral3/resolve/main/Statue-of-Liberty-Island-New-York-Bay.jpg",
                         },
                         {
                             "type": "image",
-                            "url": "https://huggingface.co/ydshieh/kosmos-2.5/resolve/main/golden-gate-bridge-san-francisco-purple-flowers-california-echium-candicans-36805947.jpg",
+                            "url": "https://huggingface.co/datasets/hf-internal-testing/testing-data-mistral3/resolve/main/golden-gate-bridge-san-francisco-purple-flowers-california-echium-candicans-36805947.jpg",
                         },
                         {
                             "type": "text",
@@ -473,7 +479,7 @@ class Mistral3IntegrationTest(unittest.TestCase):
         ]
         inputs = processor.apply_chat_template(
             messages, padding=True, add_generation_prompt=True, tokenize=True, return_dict=True, return_tensors="pt"
-        ).to(torch_device, dtype=torch.bfloat16)
+        ).to(torch_device, dtype=torch.float16)
 
         output = self.model.generate(**inputs, do_sample=False, max_new_tokens=25)
         gen_tokens = output[:, inputs["input_ids"].shape[1] :]
@@ -483,8 +489,8 @@ class Mistral3IntegrationTest(unittest.TestCase):
         expected_outputs = Expectations(
             {
                 ("xpu", 3): "Still lake reflects skies,\nWooden path to nature's heart,\nSilence speaks volumes.",
-                ("cuda", 7): "Calm waters reflect\nWhispering pines stand in silence\nPath to peace begins",
-                ("cuda", 8): "Calm waters reflect\nWhispering pines stand in silence\nPath to peace begins",
+                ("cuda", 7): 'Calm waters reflect\nWooden path to distant shore\nSilence in the pines',
+                ("cuda", 8): 'Calm waters reflect\nWooden path to distant shore\nSilence in the pines',
             }
         )  # fmt: skip
         expected_output = expected_outputs.get_expectation()
@@ -499,8 +505,8 @@ class Mistral3IntegrationTest(unittest.TestCase):
         expected_outputs = Expectations(
             {
                 ("xpu", 3): "Certainly! The images depict two iconic landmarks:\n\n1. The first image shows the Statue of Liberty in New York City.",
-                ("cuda", 7): "Certainly! The images depict the following landmarks:\n\n1. The first image shows the Statue of Liberty and the New York City",
-                ("cuda", 8): "Certainly! The images depict the following landmarks:\n\n1. The first image shows the Statue of Liberty and the New York City",
+                ("cuda", 7): 'Certainly! The images depict two famous landmarks in the United States:\n\n1. The first image shows the Statue of Liberty,',
+                ("cuda", 8): 'Certainly! The images depict two famous landmarks in the United States:\n\n1. The first image shows the Statue of Liberty,',
             }
         )  # fmt: skip
         expected_output = expected_outputs.get_expectation()
