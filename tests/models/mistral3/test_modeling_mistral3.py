@@ -368,9 +368,19 @@ class Mistral3IntegrationTest(unittest.TestCase):
             value = value.clone().detach().to("cpu")
             torch.save(value, os.path.join(test_inputs_dir, f"{test_name}_{key}.pt"))
             value_fp32 = value.to(torch.float32)
-            torch.save(value, os.path.join(test_inputs_dir, f"{test_name}_{key}_fp32.pt"))
+            torch.save(value_fp32, os.path.join(test_inputs_dir, f"{test_name}_{key}_fp32.pt"))
             loaded = torch.load(os.path.join(test_inputs_dir, f"{test_name}_{key}.pt"))
             loaded_fp32 = torch.load(os.path.join(test_inputs_dir, f"{test_name}_{key}_fp32.pt"))
+
+        with torch.no_grad():
+            out = self.model(**inputs)
+            for key, value in out.items():
+                if key == "past_key_values":
+                    continue
+                value = value.clone().detach().to("cpu")
+                torch.save(value, os.path.join(test_inputs_dir, f"{test_name}_{key}.pt"))
+                value_fp32 = value.to(torch.float32)
+                torch.save(value_fp32, os.path.join(test_inputs_dir, f"{test_name}_{key}_fp32.pt"))
 
         with torch.no_grad():
             generate_ids = self.model.generate(**inputs, max_new_tokens=20, do_sample=False)
@@ -432,9 +442,19 @@ class Mistral3IntegrationTest(unittest.TestCase):
             value = value.clone().detach().to("cpu")
             torch.save(value, os.path.join(test_inputs_dir, f"{test_name}_{key}.pt"))
             value_fp32 = value.to(torch.float32)
-            torch.save(value, os.path.join(test_inputs_dir, f"{test_name}_{key}_fp32.pt"))
+            torch.save(value_fp32, os.path.join(test_inputs_dir, f"{test_name}_{key}_fp32.pt"))
             loaded = torch.load(os.path.join(test_inputs_dir, f"{test_name}_{key}.pt"))
             loaded_fp32 = torch.load(os.path.join(test_inputs_dir, f"{test_name}_{key}_fp32.pt"))
+
+        with torch.no_grad():
+            out = self.model(**inputs)
+            for key, value in out.items():
+                if key == "past_key_values":
+                    continue
+                value = value.clone().detach().to("cpu")
+                torch.save(value, os.path.join(test_inputs_dir, f"{test_name}_{key}.pt"))
+                value_fp32 = value.to(torch.float32)
+                torch.save(value_fp32, os.path.join(test_inputs_dir, f"{test_name}_{key}_fp32.pt"))
 
         output = self.model.generate(**inputs, do_sample=False, max_new_tokens=25)
 
@@ -527,9 +547,19 @@ class Mistral3IntegrationTest(unittest.TestCase):
             value = value.clone().detach().to("cpu")
             torch.save(value, os.path.join(test_inputs_dir, f"{test_name}_{key}.pt"))
             value_fp32 = value.to(torch.float32)
-            torch.save(value, os.path.join(test_inputs_dir, f"{test_name}_{key}_fp32.pt"))
+            torch.save(value_fp32, os.path.join(test_inputs_dir, f"{test_name}_{key}_fp32.pt"))
             loaded = torch.load(os.path.join(test_inputs_dir, f"{test_name}_{key}.pt"))
             loaded_fp32 = torch.load(os.path.join(test_inputs_dir, f"{test_name}_{key}_fp32.pt"))
+
+        with torch.no_grad():
+            out = self.model(**inputs)
+            for key, value in out.items():
+                if key == "past_key_values":
+                    continue
+                value = value.clone().detach().to("cpu")
+                torch.save(value, os.path.join(test_inputs_dir, f"{test_name}_{key}.pt"))
+                value_fp32 = value.to(torch.float32)
+                torch.save(value_fp32, os.path.join(test_inputs_dir, f"{test_name}_{key}_fp32.pt"))
 
         output = self.model.generate(**inputs, do_sample=False, max_new_tokens=25)
         gen_tokens = output[:, inputs["input_ids"].shape[1] :]
