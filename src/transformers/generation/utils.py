@@ -3592,6 +3592,7 @@ class GenerationMixin(ContinuousMixin):
         else:
             is_prefill = True
 
+        step = 0
         while self._has_unfinished_sequences(this_peer_finished, synced_gpus, device=input_ids.device):
             # prepare model inputs
             model_inputs = self.prepare_inputs_for_generation(input_ids, **model_kwargs)
@@ -3618,6 +3619,19 @@ class GenerationMixin(ContinuousMixin):
             # Copy is needed to avoid keeping a hanging ref to outputs.logits which may be very large for first iteration
             # (the clone itself is always small)
             next_token_logits = outputs.logits[:, -1, :].to(copy=True, dtype=torch.float32, device=input_ids.device)
+
+            step += 1
+
+            # we want to save logits
+            import os
+            test_name = os.environ.get('PYTEST_CURRENT_TEST', '')
+            if len(test_name) > 0:
+                test_name = test_name.split(':')[-1].split(' ')[0]
+                if test_name in ["test_mistral3_integration_generate", "test_mistral3_integration_batched_generate", "test_mistral3_integration_batched_generate_multi_image"]:
+                    test_inputs_dir = os.path.join("test_inputs", test_name)
+                    value = next_token_logits
+                    value = value.clone().detach().to("cpu")
+                    torch.save(value, os.path.join(test_inputs_dir, f"{test_name}_logits_step_{step}.pt"))
 
             # pre-process distribution
             next_token_scores = logits_processor(input_ids, next_token_logits)
