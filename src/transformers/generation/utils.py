@@ -3623,7 +3623,6 @@ class GenerationMixin(ContinuousMixin):
             step += 1
 
             # we want to save logits
-            import os
             test_name = os.environ.get('PYTEST_CURRENT_TEST', '')
             if len(test_name) > 0:
                 test_name = test_name.split(':')[-1].split(' ')[0]
